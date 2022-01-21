@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+
+
+<!-- @STYLE SECTION -->
+
+<!-- external css file 
+  <link rel="stylesheet" type="text/css" href="default.css">
+-->
+
+<style>
+html, body {
+background-color: #E0E0E0;
+color: black;
+font-family: monospace;
+margin:  0;
+padding: 0;
+margin-bottom: 25px;
+}
+/* The console container element */
+/*#console {
+height: 400px;
+width: 750px;
+position:relative;
+background-color: black;
+border: 2px solid #CCC;
+margin: 0 auto;
+margin-top: 50px;
+} */
+
+/*
+#console {
+height: 400px;
+width: 750px;
+position:relative; 
+background-color: yellow;
+border: 2px solid #CCC;
+margin: 0 auto;
+margin-bottom: 50px;
+}
+*/
+
+/* The inner console element. */
+.jqconsole {
+padding: 10px;
+}
+/* The cursor. */
+.jqconsole-cursor {
+background-color: gray;
+}
+/* The cursor color when the console looses focus. */
+.jqconsole-blurred .jqconsole-cursor {
+background-color: #666;
+}
+/* The current prompt text color */
+.jqconsole-prompt {
+color: #00f;
+}
+/* The command history */
+.jqconsole-old-prompt {
+color: #b00;
+font-weight: normal;
+}
+/* The text color when in input mode. */
+.jqconsole-input {
+color: #d00;
+}
+/* Previously entered input. */
+.jqconsole-old-input {
+color: #b00;
+font-weight: normal;
+}
+/* The text color of the output. */
+.jqconsole-output {
+color: blue;
+}
+.jqconsole-header {
+color: red;
+}
+</style>
+
+
+<!-- @NEW BEGIN -->
+<style type="text/css">
+.help-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    #width: 500px;
+    #height: 200px;
+    text-align: left;
+    background-color: #e8eae6;
+    box-sizing: border-box;
+    padding: 10px;
+    z-index: 100;
+    display: none;
+    /*to hide popup initially*/
+}
+  
+.help-close-btn {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    background-color: black;
+    color: white;
+    border-radius: 50%;
+    padding: 4px;
+}
+
+pre {
+  display: block;
+  font-family: monospace;
+  white-space: pre;
+  margin: 1em 0;
+}
+
+
+.cli-help-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    #width: 500px;
+    #height: 200px;
+    text-align: left;
+    background-color: #e8eae6;
+    box-sizing: border-box;
+    padding: 10px;
+    z-index: 100;
+    display: none;
+    /*to hide popup initially*/
+}
+  
+.cli-help-close-btn {
+    position: absolute;
+    right: 20px;
+    top: 15px;
+    background-color: black;
+    color: white;
+    border-radius: 50%;
+    padding: 4px;
+}
+
+
+</style>
+<!-- @NEW END -->
+    
+
+
+
+<!-- SCRIPT CONFIG VARS -->
+<script>
+jxmt_start_msg="REDUCE jaxmate V 0.5 (node REDUCE Server/MathJax -- type @help)\n\n\n";
+jxmt_prompt="> ";
+jxmt_cfg_prefix="@";
+jxmt_div_prefix='MathDiv';
+jxmt_text_output=false;
+jxmt_mathjax_output=true;
+jxmt_socket_io='http://localhost:3010';
+jxmt_scale=110;
+jxmt_help_as_popup=true;
+jxmt_cli_help_as_popup=true;
+
+
+jxmt_help_text=`
+  Finish input operation  ............... Enter
+  Multiline ............................. Shift+Enter
+  History ............................... Up/Down
+  Zoom +/- .............................. Ctrl+Plus/Minus
+  MathJax settings ...................... Mouse+RClick
+  Console text on/off ................... @text on/off
+  MathJax output on/off ................. @mathjax on/off
+  Show history .......................... @history
+  Dump content .......................... @dump
+  Clear (! history+screen) .............. @clear
+  REDUCE help ........................... @client-help
+  REDUCE version ........................ version?
+  Render HTML or LaTeX (w.o. eval) ...... # <code>
+  Set TeX equation mode <$$> ............ lisp '(tex:eqmode); 
+  Set TeX inline mode <$> ............... lisp '(tex:inline);
+  Save a dump + history to a file ....... %save filename
+  Quit REDUCE (reload possible) ......... quit; or bye;
+  Exit REDUCE and node server ........... bye; <newline> ; 
+  ** see https://github.com/nilqed/reduce_jaxmate for more.
+  \n`;
+  
+jxmt_client_help=`<p>The link below will open a new window/tab:
+  <a href="https://reduce-algebra.sourceforge.io/documentation.php" 
+     target="_blank">REDUCE Documentation @ reduce-algebra.sourceforge.io </a>
+  <br>`;
+
+</script>
+
+<!-- @SCRIPT MATHJAX CONFIG -->
+<!-- http://docs.mathjax.org/en/latest/configuration.html -->
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({tex2jax:{inlineMath:[['$','$']]},
+    CommonHTML: { linebreaks: { automatic: true }, scale: jxmt_scale },
+    "HTML-CSS": { linebreaks: { automatic: true }, fonts: ["TeX"], scale: jxmt_scale},
+    SVG: { linebreaks: { automatic: true } }});
+</script>
+
+<!-- @SCRIPT MATHJAX CDN 
+<script 
+  src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/
+       latest.js?config=TeX-AMS-MML_HTMLorMML' async>
+</script>
+
+Changed: TeX-AMS-MML_HTMLorMML -> TeX-AMS_CHTML
+-->
+
+<title>REDUCE Client</title>
+</head>
+
+<body>  
+
+<!-- @NEW BEGIN div containing the popup -->
+
+<div class="help-content">
+  <div onclick="toggleHelpPopup()" class="help-close-btn">
+    x
+  </div>
+  <h3>HELP</h3>
+  <pre>
+  Finish input operation  ............... Enter
+  Multiline ............................. Shift+Enter
+  History ............................... Up/Down
+  Zoom +/- .............................. Ctrl+Plus/Minus
+  MathJax settings ...................... Mouse+RClick
+  Console text on/off ................... @text on/off
+  MathJax output on/off ................. @mathjax on/off
+  Show history .......................... @history
+  Dump content .......................... @dump
+  Clear (! history+screen) .............. @clear
+  REDUCE help ........................... @client-help
+  REDUCE version ........................ version?
+  Render HTML or LaTeX (w.o. eval) ...... # &lt;code&gt;
+  Set TeX equation mode &lt;$$&gt; ............ lisp '(tex:eqmode); 
+  Set TeX inline mode &lt;$&gt; ............... lisp '(tex:inline);
+  Save a dump + history to a file ....... %save filename
+  Quit REDUCE (reload possible) ......... quit; or bye;
+  Exit REDUCE and node server ........... bye; <\newline> ; 
+  ** see https://github.com/nilqed/reduce_jaxmate for more.
+  </pre>
+  <p>
+  <a href="https://reduce-algebra.sourceforge.io/documentation.php" 
+     target="_blank">REDUCE Documentation @ reduce-algebra.sourceforge.io </a>
+  </p>
+</div>
+ 
+<script type="text/javascript">     
+// Function to show and hide the client help popup
+  function toggleHelpPopup() { $(".help-content").toggle(); }
+</script>
+
+    
+<div class="cli-help-content">
+  <div onclick="toggleClientHelpPopup()" class="cli-help-close-btn">
+    x
+  </div>
+  <h3>CLIENT HELP</h3>
+  <pre>
+   TODO .......................................................
+   ajkjjaksjaksjksaks
+   aasasaaaasasassaa
+  </pre>
+  <p>
+  <a href="https://reduce-algebra.sourceforge.io/documentation.php" 
+     target="_blank">REDUCE Documentation @ reduce-algebra.sourceforge.io </a>
+  </p>
+</div>
+ 
+<script type="text/javascript">     
+// Function to show and hide the popup
+  function toggleClientHelpPopup() { $(".cli-help-content").toggle(); }
+</script>    
+    
+    
+<!-- @NEW END div containing the popup --> 
+   
+
+<!-- TeX macros (to correct tex output in FriCAS/REDUCE) -->
+<div id="pretex"> 
+$\def\sp{^}\def\sb{_}\def\leqno(#1){}$
+$\def\erf\{\mathrm{erf}}\def\sinh{\mathrm{sinh}}$
+$\def\zag#1#2{{{ \left.{#1}\right|}\over{\left|{#2}\right.}}}$
+$\def\({\left(}$
+$\def\){\right)}$
+$\def\d{d}$
+$\def\[{}$
+$\def\]{}$
+$\def\co{,}$
+</div>
+
+
+<!-- @DIV CONSOLE -->
+<div id="console"></div>  
+
+<!-- -->
+<script src="/static/socket.io-client/dist/socket.io.js"></script>
+<script src="/static/jquery/dist/jquery.js"></script>
+<script src="/static/jq-console/lib/jqconsole.js"></script>
+<script src="/static/mathjax/MathJax.js?config=TeX-AMS_CHTML" async></script> 
+
+   
+<script>
+    var socket = io(jxmt_socket_io);
+    socket.on('connect', function(){socket.emit('do something',{})});
+    socket.on('myevent', function(data){});
+    socket.on('disconnect', function(){});
+</script>
+
+
+<!-- prevent/ask reloading the page -->
+<script type="text/javascript">
+    $(window).bind({
+        beforeunload: function(ev) {
+            ev.preventDefault();
+        },
+        unload: function(ev) {
+            ev.preventDefault();
+        }
+    });
+</script>
+
+
+
+<!-- @SCRIPT START -->
+<script>
+  $(function () {
+    var jqconsole = $('#console').jqconsole(jxmt_start_msg, jxmt_prompt);
+    var idc=0; // div id counter
+    var out={id:"",data:""}; // data format
+    
+    function jxmt_cfg_handler (cmd) {
+      //jqconsole.SetPromptLabel('cfg> ');
+      //jqconsole.Write("cfg\n", 'jqconsole-output');
+      
+      //if (s=="@text off") {jxmt_text_output=false;};
+      //if (s=="@text on") {jxmt_text_output=true;};
+      //if (s=="@mathjax off") {jxmt_mathjax_output=false;};
+      //if (s=="@mathjax on") {jxmt_mathjax_output=true;};
+      //if (s=="@quit") {jqconsole.SetPromptLabel(jxmt_prompt);};
+      switch(cmd) {
+          case "@text off":
+            jxmt_text_output=false;
+            break;
+          case "@text on":
+            jxmt_text_output=true;
+            break;
+          case "@mathjax off":
+            jxmt_mathjax_output=false;
+            break;
+          case "@mathjax on":
+            jxmt_mathjax_output=true;
+            break;
+          case "@history":
+            var history = jqconsole.GetHistory();
+            jqconsole.Write(history);
+            jqconsole.Write('\n');
+            var i;
+            for  (i = 0; i < history.length; i++) {
+                    jqconsole.Write(i.toString()+' : '+history[i]+'\n');
+            };
+            break;
+          case "@dump":
+            jqconsole.Write(jqconsole.Dump());
+            jqconsole.Write('\n');
+            jqconsole.Dump();
+            break; 
+          case "@clear":
+            jqconsole.Clear();           
+            break;            
+          case "@help":
+            if (jxmt_help_as_popup == true) 
+              { toggleHelpPopup();}  
+            else
+              {jqconsole.Write(jxmt_help_text, 'jqconsole-output');};
+            break;
+          case "@client-help":
+            //'<div class="jaxmatecleint">JaxMate Client</div>';
+            if (jxmt_cli_help_as_popup == true) 
+              { toggleClientHelpPopup();}  
+            else
+              {jqconsole.Append($(jxmt_client_help));}; 
+            break;
+          case "@reset":
+            jqconsole.Reset();
+            break;
+          case "@print":
+            window.print();
+            break; 
+          default:
+            jqconsole.Write("No such command ...\n", 'jqconsole-output');
+        } 
+    };
+
+    // Output coming from server (after emission of 'reduce_eval')
+    socket.on('reduce_output', function(out){ 
+      if (jxmt_text_output) 
+      {
+            jqconsole.Write(out.data + '\n', 'jqconsole-output');
+            
+      };
+      if (jxmt_mathjax_output)
+      {
+            document.getElementById(out.id).innerHTML=out.data;
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,out.id]);
+      };
+            //https://www.w3schools.com/jsref/met_element_scrollintoview.asp
+            document.getElementById(out.id).scrollIntoView();  //cool
+    });
+    
+    // new: exit (quit or bye).
+    // not optimal yet ... todo
+    var exitJXMT = function (d) {
+      if (confirm("Really quit?") == true) {
+        //socket.emit('reduce_eval',d);
+        jqconsole.Write("Then write 'bye;' ENTER and to exit server: ';' again ...\n", 'jqconsole-output');
+        //jqconsole.Write("Reload this page or exit server (CTRL-C) \n", 'jqconsole-output');
+      } else 
+      { jqconsole.Write("QUIT-ABORTED ...\n", 'jqconsole-output'); };
+      startPrompt(); 
+    };
+    
+    var startPrompt = function () {
+      // Start the prompt with history enabled.
+      jqconsole.Prompt(true, function (input) {
+        // Output srvdata with the class jqconsole-output.
+        // div counter
+        var divID=jxmt_div_prefix + idc;
+        // cfg_handler
+        if (input.startsWith(jxmt_cfg_prefix)) 
+          {jxmt_cfg_handler(input);startPrompt();}
+        else if (input.startsWith("quit;")) 
+          { exitJXMT({id:divID,data:input+';\n;\n'}); }
+        else if (input.startsWith("#"))
+          { input = input.replace('#','');
+            jqconsole.Append($('<div id=' + divID + '>'+ input + '</div>'));
+            MathJax.Hub.Queue(["Typeset",MathJax.Hub,divID]);
+            idc++;
+            startPrompt();
+          } 
+        else if (input.startsWith("%save"))
+          { input = input.replace('%save','').trim();  // filename! 
+            var txt = jqconsole.Dump() + jqconsole.GetHistory();
+            socket.emit('reduce_save',{filename:input,content:txt});
+            startPrompt();
+          }
+        else
+         {
+           socket.emit('reduce_eval',{id:divID,data:input}); // socket emit -> send input
+           //jqconsole.Write(out.data + '\n', 'jqconsole-output');
+           //divID = divID.replace('$$','$');
+           jqconsole.Append($('<div id=' + divID + '></div>'));
+           //MathJax.Hub.Queue(["Typeset",MathJax.Hub,divID]);
+           idc++;
+           // Restart the prompt.
+           startPrompt();};
+      });
+    };
+    startPrompt();
+  });
+</script>
+
+</body>
+</html>
