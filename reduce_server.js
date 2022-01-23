@@ -2,7 +2,7 @@
 
 // Spawning App
 const { spawn } = require('child_process');
-const repl = spawn('redcsl.bat', ['--nogui']);
+const repl = spawn('redcsl', ['--nogui']);
 
 
 // Server
