@@ -2,7 +2,7 @@
 
 // Spawning App
 const { spawn } = require('child_process');
-const repl = spawn('redcsl', ['--nogui']);
+const repl = spawn('redcsl.bat', ['--nogui']);
 
 
 // Server
@@ -10,7 +10,8 @@ var port = 3010;
 var clientHTML = '/reduce_client.html';
 //var clientHTML = '/frameset.html';
 var dataID = '';
-var inlineMath = true;   // replace $$ by $
+
+//var inlineMath = true;   // replace $$ by $
 
 var http = require('http');
 var express = require('express');
@@ -51,12 +52,13 @@ repl.stdout.on('data', (data) => {
   };
   // tri.red defines prin2('!$!$); terpri(); return(nil) % end math group
   // we can intefere there or replace '$$' by '$'.
-  if (answer.includes('(tex !: inline)')) {inlineMath=true};
-  if (answer.includes('(tex !: eqmode)')) {inlineMath=false};
-  if (inlineMath == true) { 
-    answer = answer.replace('$$','$');
-    answer = answer.replace('$$','$');
-  }
+  /////// moved to reduce_client @eqmode on/off
+  ///if (answer.includes('(tex !: inline)')) {inlineMath=true};
+  ///if (answer.includes('(tex !: eqmode)')) {inlineMath=false};
+  ///if (inlineMath == true) { 
+  ///  answer = answer.replace('$$','$');
+  ///  answer = answer.replace('$$','$');
+  ///}
   console.log(`Out[${dataID}]:\n${answer}`);
   io.emit('reduce_output',{id:dataID, data:answer});
 });

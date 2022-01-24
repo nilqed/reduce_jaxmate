@@ -163,6 +163,7 @@ jxmt_socket_io='http://localhost:3010';
 jxmt_scale=110;
 jxmt_help_as_popup=true;
 jxmt_cli_help_as_popup=true;
+jxmt_one_dollar=false;
 
 
 jxmt_help_text=`
@@ -175,12 +176,13 @@ jxmt_help_text=`
   MathJax output on/off ................. @mathjax on/off
   Show history .......................... @history
   Dump content .......................... @dump
-  Clear (! history+screen) .............. @clear
+  Clear screen .......................... @clear
   REDUCE help ........................... @client-help
   REDUCE version ........................ version?
   Render HTML or LaTeX (w.o. eval) ...... # <code>
   Set TeX equation mode <$$> ............ lisp '(tex:eqmode); 
   Set TeX inline mode <$> ............... lisp '(tex:inline);
+  Set MathJax equation mode on/off ...... @eqmode on/off
   Save a dump + history to a file ....... %save filename
   Quit REDUCE (reload possible) ......... quit; or bye;
   Exit REDUCE and node server ........... bye; <newline> ; 
@@ -234,12 +236,13 @@ Changed: TeX-AMS-MML_HTMLorMML -> TeX-AMS_CHTML
   MathJax output on/off ................. @mathjax on/off
   Show history .......................... @history
   Dump content .......................... @dump
-  Clear (! history+screen) .............. @clear
+  Clear screen .......................... @clear
   REDUCE help ........................... @client-help
   REDUCE version ........................ version?
   Render HTML or LaTeX (w.o. eval) ...... # &lt;code&gt;
   Set TeX equation mode &lt;$$&gt; ............ lisp '(tex:eqmode); 
   Set TeX inline mode &lt;$&gt; ............... lisp '(tex:inline);
+  Set MathJax equation mode on/off ...... @eqmode on/off
   Save a dump + history to a file ....... %save filename
   Quit REDUCE (reload possible) ......... quit; or bye;
   Exit REDUCE and node server ........... bye; <\newline> ; 
@@ -401,13 +404,21 @@ $\def\co{,}$
             break;
           case "@print":
             window.print();
+            break;
+          case "@eqmode on":
+            jxmt_one_dollar=false;
+            break; 
+          case "@eqmode off":
+            jxmt_one_dollar=true;
             break; 
           default:
             jqconsole.Write("No such command ...\n", 'jqconsole-output');
         } 
     };
 
+    //////////////////////////////////////////////////////////////
     // Output coming from server (after emission of 'reduce_eval')
+    //////////////////////////////////////////////////////////////
     socket.on('reduce_output', function(out){ 
       if (jxmt_text_output) 
       {
@@ -416,7 +427,13 @@ $\def\co{,}$
       };
       if (jxmt_mathjax_output)
       {
-            document.getElementById(out.id).innerHTML=out.data;
+            var od = out.data;
+            
+            if (jxmt_one_dollar == true)
+              {od = od.replace('$$','$');
+               od = od.replace('$$','$');};
+            
+            document.getElementById(out.id).innerHTML=od;
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,out.id]);
       };
             //https://www.w3schools.com/jsref/met_element_scrollintoview.asp
