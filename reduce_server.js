@@ -8,35 +8,34 @@ const repl = spawn('redcsl.bat', ['--nogui']);
 // Server
 var port = 3010;
 var clientHTML = '/reduce_client.html';
-//var clientHTML = '/frameset.html';
 var dataID = '';
 
-//var inlineMath = true;   // replace $$ by $
 
 var http = require('http');
 var express = require('express');
 var app = express();
 
+// Bodyparser for GET/POST requests only
+app.use( express.urlencoded({extended: true}));
+app.use(express.json());
+
+// The server
 var server = http.createServer(app);
 
 
 // Passing the http.Server instance to the listen method
 var io = require('socket.io')(server);  
-//new:const { Server } = require("socket.io");
-//neW:var io = new Server(server);
 
-
+// Filesystem for saving 
 var fs = require("fs");
 
-
+// Input pipe
 var input = process.stdin.pipe(repl.stdin);
 
 // Input init/end handling
-//input.on('quit;', () => {console.log('Goodbye\n'); process.exit() });
-//input.on('%$\n', () => {inlineMath=false});
-//input.on('%$$\n', () => {inlineMath=true});
+// input.on('bye;', () => {console.log('Goodbye\n'); process.exit() });
 input.write('off output;\n');
-input.write('load_package "tri";\n'); // let __jaxmate__=true;
+input.write('load_package "tri";\n'); 
 input.write('on tex;\n');
 input.write('1;\n');
 input.write('on output;\n');
@@ -47,18 +46,9 @@ input.write('on output;\n');
 repl.stdout.on('data', (data) => {
   answer=data.toString();
   if (answer.endsWith(': ')){
-    //debug:answer = answer.replace(/(\d+):(\s*)/g, '!**RED'); // rtrim reduce prompt '>'
     answer = answer.replace(/(\d+):(\s*)/g, '');
   };
-  // tri.red defines prin2('!$!$); terpri(); return(nil) % end math group
-  // we can intefere there or replace '$$' by '$'.
-  /////// moved to reduce_client @eqmode on/off
-  ///if (answer.includes('(tex !: inline)')) {inlineMath=true};
-  ///if (answer.includes('(tex !: eqmode)')) {inlineMath=false};
-  ///if (inlineMath == true) { 
-  ///  answer = answer.replace('$$','$');
-  ///  answer = answer.replace('$$','$');
-  ///}
+ 
   console.log(`Out[${dataID}]:\n${answer}`);
   io.emit('reduce_output',{id:dataID, data:answer});
 });
@@ -75,21 +65,55 @@ app.get('/', function (req, res) {
     res.sendFile(__dirname + clientHTML);
 });
 
-// Expose the node_modules folder as static resources 
-// (to access socket.io.js in the browser)
-// maybe path.join(__dirname, 'directory')
+// Expose the node_modules folder as static resource
+// e.g. to access socket.io.js in the browser
 app.use('/static', express.static('node_modules'));
+
+
+// Other instances to serve GET/POST requests [todo:optional]
+// This responds a GET request
+app.get('/eval', function (req, res) {
+   console.log("GET request for /eval:"+req.body);
+   res.send('GET EVAL:'+req.body.data);
+})
+
+// This responds a POST request
+app.post('/eval', function (req, res) {
+   console.log("POST request for /eval:"+req.body);
+   res.send('POST EVAL'+req.body.data);
+})
+
+// This responds a DELETE request for the /del page.
+app.delete('/del', function (req, res) {
+   console.log("Got a DELETE request for /del_user");
+   res.send('Hello DELETE');
+})
+
+// This responds a GET request for the /list page.
+app.get('/list', function (req, res) {
+   console.log("GET request for /list");
+   res.send('LIST something');
+})
+
+// This responds a GET request for abcd, abxcd, ab123cd, and so on
+app.get('/ab*cd', function(req, res) {   
+   console.log("GET request for /ab*cd");
+   res.send('PATTERN MATCH');
+})
+/////
+
 
 
 // Handling the connection
 io.on('connection', (socket) => {
-    //console.log(socket.handshake);  // a lot of data without .handshake
+    //console.log(socket.handshake); //a lot of data without .handshake
     console.log("Client X connected @");
 
+    // data = {id:?, data:?}, i.e. data.id and data.data
     socket.on('reduce_eval', (data) => {
-        console.log('In['+data.id+']: '+data.data);
-        input.write(data.data+'\n'); // send to repl process
-        dataID=data.id; // push id
+        console.log('In[' + data.id +']: ' + data.data);
+        input.write(data.data + '\n');  // send to repl process
+        dataID=data.id;                 // push id (global dataID)
         // --> client debug: data.id/data.data
         //socket.emit('reduce_output',{id:data.id, data:'reduce_input:'+data.data});
     });
@@ -100,5 +124,7 @@ io.on('connection', (socket) => {
        console.log('File saved [ok].');});
     });
     
-    socket.on('disconnect', function(){console.log('Client disconnect ...');});
+    socket.on('disconnect', function()
+      {console.log('Client disconnect ...');  
+        process.exit();});  // sure?  
 });
