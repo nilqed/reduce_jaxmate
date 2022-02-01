@@ -39,6 +39,7 @@ input.write('load_package "tri";\n');
 input.write('on tex;\n');
 input.write('1;\n');
 input.write('on output;\n');
+input.write('procedure pp(s); lisp(princ(s))$\n'); // pretty print: pp str $
 
 
 
@@ -120,9 +121,15 @@ io.on('connection', (socket) => {
     
     socket.on('reduce_save', (data) =>  {
        fs.writeFile(data.filename, data.content, function (err) {
-       if (err) throw err;
+       if (err) {console.error(err); return}
        console.log('File saved [ok].');});
     });
+    
+    socket.on('reduce_load', (data) =>  {
+       fs.readFile(data.filename, data.options, function (err) {
+       if (err) {console.error(err); return}
+         console.log(data) });
+    });    
     
     socket.on('disconnect', function()
       {console.log('Client disconnect ...');  

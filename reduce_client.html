@@ -3,13 +3,7 @@
 <head>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 
-
 <!-- @STYLE SECTION -->
-
-<!-- external css file 
-  <link rel="stylesheet" type="text/css" href="default.css">
--->
-
 <style>
 html, body {
 background-color: #E0E0E0;
@@ -161,38 +155,9 @@ jxmt_text_output=false;
 jxmt_mathjax_output=true;
 jxmt_socket_io='http://localhost:3010';
 jxmt_scale=110;
-jxmt_help_as_popup=true;
-jxmt_cli_help_as_popup=true;
 jxmt_one_dollar=false;
 
 
-jxmt_help_text=`
-  Finish input operation  ............... Enter
-  Multiline ............................. Shift+Enter
-  History ............................... Up/Down
-  Zoom +/- .............................. Ctrl+Plus/Minus
-  MathJax settings ...................... Mouse+RClick
-  Console text on/off ................... @text on/off
-  MathJax output on/off ................. @mathjax on/off
-  Show history .......................... @history
-  Dump content .......................... @dump
-  Clear screen .......................... @clear
-  REDUCE help ........................... @client-help
-  REDUCE version ........................ version?
-  Render HTML or LaTeX (w.o. eval) ...... # <code>
-  Set TeX equation mode <$$> ............ lisp '(tex:eqmode); 
-  Set TeX inline mode <$> ............... lisp '(tex:inline);
-  Set MathJax equation mode on/off ...... @eqmode on/off
-  Save a dump + history to a file ....... %save filename
-  Quit REDUCE (reload possible) ......... quit; or bye;
-  Exit REDUCE and node server ........... bye; <newline> ; 
-  ** see https://github.com/nilqed/reduce_jaxmate for more.
-  \n`;
-  
-jxmt_client_help=`<p>The link below will open a new window/tab:
-  <a href="https://reduce-algebra.sourceforge.io/documentation.php" 
-     target="_blank">REDUCE Documentation @ reduce-algebra.sourceforge.io </a>
-  <br>`;
 
 </script>
 
@@ -240,8 +205,6 @@ Changed: TeX-AMS-MML_HTMLorMML -> TeX-AMS_CHTML
   REDUCE help ........................... @client-help
   REDUCE version ........................ version?
   Render HTML or LaTeX (w.o. eval) ...... # &lt;code&gt;
-  Set TeX equation mode &lt;$$&gt; ............ lisp '(tex:eqmode); 
-  Set TeX inline mode &lt;$&gt; ............... lisp '(tex:inline);
   Set MathJax equation mode on/off ...... @eqmode on/off
   Save a dump + history to a file ....... %save filename
   Quit REDUCE (reload possible) ......... quit; or bye;
@@ -348,14 +311,6 @@ $\def\co{,}$
     var out={id:"",data:""}; // data format
     
     function jxmt_cfg_handler (cmd) {
-      //jqconsole.SetPromptLabel('cfg> ');
-      //jqconsole.Write("cfg\n", 'jqconsole-output');
-      
-      //if (s=="@text off") {jxmt_text_output=false;};
-      //if (s=="@text on") {jxmt_text_output=true;};
-      //if (s=="@mathjax off") {jxmt_mathjax_output=false;};
-      //if (s=="@mathjax on") {jxmt_mathjax_output=true;};
-      //if (s=="@quit") {jqconsole.SetPromptLabel(jxmt_prompt);};
       switch(cmd) {
           case "@text off":
             jxmt_text_output=false;
@@ -371,33 +326,26 @@ $\def\co{,}$
             break;
           case "@history":
             var history = jqconsole.GetHistory();
-            jqconsole.Write(history);
-            jqconsole.Write('\n');
+            //jqconsole.Write(history);
+            //jqconsole.Write('\n');
             var i;
             for  (i = 0; i < history.length; i++) {
                     jqconsole.Write(i.toString()+' : '+history[i]+'\n');
             };
             break;
           case "@dump":
-            jqconsole.Write(jqconsole.Dump());
-            jqconsole.Write('\n');
+            //jqconsole.Write(jqconsole.Dump());
+            //jqconsole.Write('\n');
             jqconsole.Dump();
             break; 
           case "@clear":
             jqconsole.Clear();           
             break;            
           case "@help":
-            if (jxmt_help_as_popup == true) 
-              { toggleHelpPopup();}  
-            else
-              {jqconsole.Write(jxmt_help_text, 'jqconsole-output');};
+             toggleHelpPopup();
             break;
           case "@client-help":
-            //'<div class="jaxmatecleint">JaxMate Client</div>';
-            if (jxmt_cli_help_as_popup == true) 
-              { toggleClientHelpPopup();}  
-            else
-              {jqconsole.Append($(jxmt_client_help));}; 
+            toggleClientHelpPopup();  
             break;
           case "@reset":
             jqconsole.Reset();
@@ -472,9 +420,20 @@ $\def\co{,}$
           } 
         else if (input.startsWith("%save"))
           { input = input.replace('%save','').trim();  // filename! 
-            var txt = jqconsole.Dump() + jqconsole.GetHistory();
+            //var txt = jqconsole.Dump() + jqconsole.GetHistory();
+            var txt = '';
+            var history = jqconsole.GetHistory();
+            var i;
+            for  (i = 0; i < history.length; i++) {
+                    txt = txt + i.toString() + ' : ' + history[i]+'\n' ;
+            };           
             socket.emit('reduce_save',{filename:input,content:txt});
             startPrompt();
+          }
+        else if (input.startsWith("%load"))
+          { input = input.replace('%load','').trim();  // filename! 
+            socket.emit('reduce_load',{filename:input, options:'utf-8'});
+            startPrompt();             
           }
         else
          {

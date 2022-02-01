@@ -1,3 +1,6 @@
+**NOTE**: this is a hack (just to produce MathJax formulae), **not intended** for production! There are several excellent frontends for [REDUCE](https://reduce-algebra.sourceforge.io/), e.g.
+[RUN-REDUCE](https://fjwright.github.io/Run-REDUCE/) or [TeXmacs](https://texmacs.org/tmweb/home/welcome.en.html) among others.
+
 # reduce_jaxmate
 REDUCE in browser (scratchpad, MathJax) (:warning: :construction:)
 
