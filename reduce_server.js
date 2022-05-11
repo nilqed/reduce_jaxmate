@@ -126,9 +126,23 @@ io.on('connection', (socket) => {
     });
     
     socket.on('reduce_load', (data) =>  {
-       fs.readFile(data.filename, data.options, function (err) {
-       if (err) {console.error(err); return}
-         console.log(data) });
+       fs.readFile(data.filename, data.options, function (err,json) {
+       if (err) {
+        console.log(`Error reading file from disk: ${err}`);
+       } else {
+
+        // parse JSON string to JSON object
+        const entries = JSON.parse(json);
+
+        // print all databases
+        entries.forEach(db => {
+            console.log(`${db.id}: ${db.input}`);
+            setTimeout(() => {io.emit('load_json', db.input);
+               console.log("Delayed for 500 ms."); }, "500");
+        });
+       };
+          
+         });
     });    
     
     socket.on('disconnect', function()

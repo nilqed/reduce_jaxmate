@@ -206,7 +206,8 @@ Changed: TeX-AMS-MML_HTMLorMML -> TeX-AMS_CHTML
   REDUCE version ........................ version?
   Render HTML or LaTeX (w.o. eval) ...... # &lt;code&gt;
   Set MathJax equation mode on/off ...... @eqmode on/off
-  Save a dump + history to a file ....... %save filename
+  Save history to a file (json) ......... %save filename
+  Load a saved file (json) .............. %load filename 
   Quit REDUCE (reload possible) ......... quit; or bye;
   Exit REDUCE and node server ........... bye; <\newline> ; 
   ** see https://github.com/nilqed/reduce_jaxmate for more.
@@ -284,7 +285,6 @@ $\def\co{,}$
 <script>
     var socket = io(jxmt_socket_io);
     socket.on('connect', function(){socket.emit('do something',{})});
-    socket.on('myevent', function(data){});
     socket.on('disconnect', function(){});
 </script>
 
@@ -364,6 +364,7 @@ $\def\co{,}$
         } 
     };
 
+    
     //////////////////////////////////////////////////////////////
     // Output coming from server (after emission of 'reduce_eval')
     //////////////////////////////////////////////////////////////
@@ -393,7 +394,7 @@ $\def\co{,}$
     var exitJXMT = function (d) {
       if (confirm("Really quit?") == true) {
         //socket.emit('reduce_eval',d);
-        jqconsole.Write("Then write 'bye;' ENTER and to exit server: ';' again ...\n", 'jqconsole-output');
+        jqconsole.Write("Close the TAB or use CTRL-C in the server window ...\n", 'jqconsole-output');
         //jqconsole.Write("Reload this page or exit server (CTRL-C) \n", 'jqconsole-output');
       } else 
       { jqconsole.Write("QUIT-ABORTED ...\n", 'jqconsole-output'); };
@@ -424,9 +425,15 @@ $\def\co{,}$
             var txt = '';
             var history = jqconsole.GetHistory();
             var i;
-            for  (i = 0; i < history.length; i++) {
-                    txt = txt + i.toString() + ' : ' + history[i]+'\n' ;
-            };           
+            for  (i = 0; i < history.length-1; i++) {
+                    //txt = txt + i.toString() + ' : ' + history[i]+'\n' ;
+                    
+                    txt = txt + '{ "id": "' +  i.toString() + '",' +
+                                '"input": "' + history[i] + '"}';
+                                
+                    if (i < history.length - 2) {txt=txt+',\n'};                     
+            };   
+            txt = '[\n' + txt + ']\n';        
             socket.emit('reduce_save',{filename:input,content:txt});
             startPrompt();
           }
@@ -447,6 +454,23 @@ $\def\co{,}$
            startPrompt();};
       });
     };
+    
+    socket.on('load_json', function(data) {
+          var divID=jxmt_div_prefix + idc;
+          var history = jqconsole.GetHistory();
+          //jqconsole.SetPromptText(data);
+          //setTimeout(() => {
+            jqconsole.Write(data);
+            socket.emit('reduce_eval',{id:divID,data:data});
+            jqconsole.Append($('<div id=' + divID + '></div>'));
+            idc++;
+            history.push(data);
+            jqconsole.SetHistory(history);   
+           // }, "500");
+          //jqconsole.ClearPromptText();
+          //startPrompt();
+    });  // %load c:/users/kfp/desktop/reds.json
+    
     startPrompt();
   });
 </script>
