@@ -6,6 +6,7 @@ REDUCE in browser (scratchpad, MathJax) (:warning: :construction:)
 
 ![red_jxmt1](docs/test.png)
 
+#### Important
 On Linux change `redcsl.bat` to `redcsl` in `reduce_server.js`:
 
 ```
@@ -59,5 +60,9 @@ One may mix HTML and LaTeX as well:
 ```
 > pp "<h1>Hello $\LaTeX$</h1>" $
 ```
+
+### %save/%load *.json
+
+![red_jxmt1](docs/redsession.png)
 
 
