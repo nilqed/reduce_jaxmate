@@ -29,6 +29,21 @@ var io = require('socket.io')(server);
 // Filesystem for saving 
 var fs = require("fs");
 
+// Create the LaTeX log
+var texlogfile = `logs/REDUCE_jxmt_${Date.now()}.tex` ;
+
+// Define the LaTeX log function
+function texlog(content) {
+fs.appendFile(texlogfile, content, err => {
+  if (err) {
+    console.error(err);
+  }
+  // file written successfully
+});
+};
+
+
+
 // Input pipe
 var input = process.stdin.pipe(repl.stdin);
 
@@ -51,6 +66,7 @@ repl.stdout.on('data', (data) => {
   };
  
   console.log(`Out[${dataID}]:\n${answer}`);
+  texlog(answer);
   io.emit('reduce_output',{id:dataID, data:answer});
 });
 
@@ -63,6 +79,7 @@ console.log("REDUCE Server listening on port "+ port.toString());
 // Registering the route of your app that returns the HTML start file
 app.get('/', function (req, res) {
     console.log("App root");
+    texlog("%START");
     res.sendFile(__dirname + clientHTML);
 });
 
@@ -113,6 +130,7 @@ io.on('connection', (socket) => {
     // data = {id:?, data:?}, i.e. data.id and data.data
     socket.on('reduce_eval', (data) => {
         console.log('In[' + data.id +']: ' + data.data);
+        texlog('\\begin{reduce}\n' + data.data + '\n\\end{reduce}\n');
         input.write(data.data + '\n');  // send to repl process
         dataID=data.id;                 // push id (global dataID)
         // --> client debug: data.id/data.data

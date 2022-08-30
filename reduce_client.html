@@ -203,8 +203,8 @@ Changed: TeX-AMS-MML_HTMLorMML -> TeX-AMS_CHTML
   Dump content .......................... @dump
   Clear screen .......................... @clear
   REDUCE help ........................... @client-help
-  REDUCE version ........................ version?
-  Render HTML or LaTeX (w.o. eval) ...... # &lt;code&gt;
+  REDUCE version ........................ todo
+  Render HTML or LaTeX (w.o. eval) ...... %# &lt;code&gt;
   Set MathJax equation mode on/off ...... @eqmode on/off
   Save history to a file (json) ......... %save filename
   Load a saved file (json) .............. %load filename 
@@ -412,8 +412,8 @@ $\def\co{,}$
           {jxmt_cfg_handler(input);startPrompt();}
         else if (input.startsWith("quit;")) 
           { exitJXMT({id:divID,data:input+';\n;\n'}); }
-        else if (input.startsWith("#"))
-          { input = input.replace('#','');
+        else if (input.startsWith("%#"))
+          { input = input.replace('%#','');
             jqconsole.Append($('<div id=' + divID + '>'+ input + '</div>'));
             MathJax.Hub.Queue(["Typeset",MathJax.Hub,divID]);
             idc++;

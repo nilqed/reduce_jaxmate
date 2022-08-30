@@ -1,0 +1,1056 @@
+Reduce (CSL, rev 6339), 16-Jun-2022 ...
+
+Using ~/.reducerc ; type myhelp() for furter info.
+
+
+%START% TeX-REDUCE-Interface 0.71
+% set greek asserted
+% set lowercase asserted
+% set Greek asserted
+% set Uppercase asserted
+% \tolerance 10
+% \hsize=150mm
+\begin{reduce}
+load_package excalc;
+
+pform {h,phi,theta}=0;
+fdomain h=h(phi,theta);
+
+eqh := h = x * cos(phi) * sin(theta) +
+           y * sin(phi) * sin(theta) +
+           z * cos(theta);
+           
+eqh_phi:=@(eqh,phi);
+eqh_theta:=@(eqh,theta);
+
+xyz:= first solve({eqh_phi,eqh_theta,eqh},{x,y,z})$
+xyz:= map(trigsimp ~w,xyz);
+
+pform {x,y,z}=0;
+fdomain x=x(phi,theta), y=y(phi,theta), z=z(phi,theta);
+
+factor d theta, d phi;
+
+%d first xyz;
+
+xyz_phi:=map(df(rhs ~w,phi),xyz);
+xyz_theta:=map(df(rhs ~w,theta),xyz);
+
+% tangential frame (vectors)
+g1:=mat((first xyz_phi, second xyz_phi, third xyz_phi)); 
+g2:=mat((first xyz_theta, second xyz_theta, third xyz_theta)); 
+
+% normal frame
+n:=mat((cos(phi) * sin(theta),sin(phi) * sin(theta),cos(theta)));
+
+
+\end{reduce}
+
+*** ^ redefined 
+
+$$
+eqh:=
+\[h=
+  \[\cos 
+    \(\phi 
+    \)
+    \cdot \sin 
+    \(\theta 
+    \)
+    \cdot x
+    +\cos 
+    \(\theta 
+    \)
+    \cdot z
+    +\sin 
+    \(\phi 
+    \)
+    \cdot \sin 
+    \(\theta 
+    \)
+    \cdot y
+  \]
+\]
+$$
+
+$$
+eqh\_phi:=
+\[\partial _{\phi }h=
+  \[\sin 
+    \(\theta 
+    \)
+    \cdot 
+    \(\cos 
+      \(\phi 
+      \)
+      \cdot y
+      -\sin 
+      \(\phi 
+      \)
+      \cdot x
+    \)
+  \]
+\]
+$$
+
+$$
+eqh\_theta:=
+\[\partial _{\theta }h=
+  \[\cos 
+    \(\phi 
+    \)
+    \cdot \cos 
+    \(\theta 
+    \)
+    \cdot x
+    +\cos 
+    \(\theta 
+    \)
+    \cdot \sin 
+    \(\phi 
+    \)
+    \cdot y
+    -\sin 
+    \(\theta 
+    \)
+    \cdot z
+  \]
+\]
+$$
+
+
+$$
+xyz:=
+\[\{x=
+    \[\frac{\cos 
+            \(\phi 
+            \)
+            \cdot \cos 
+            \(\theta 
+            \)
+            \cdot \partial _{\theta }h\cdot \sin 
+            \(\theta 
+            \)
+            +\cos 
+            \(\phi 
+            \)
+            \cdot \sin 
+            \(\theta 
+            \)
+            ^{2}\cdot h
+            -\partial _{\phi }h\cdot \sin 
+            \(\phi 
+            \)
+            }{
+            \sin 
+            \(\theta 
+            \)
+            }
+    \]
+    \co y=
+    \[\frac{\cos 
+            \(\phi 
+            \)
+            \cdot \partial _{\phi }h
+            +\cos 
+            \(\theta 
+            \)
+            \cdot \partial _{\theta }h\cdot \sin 
+            \(\phi 
+            \)
+            \cdot \sin 
+            \(\theta 
+            \)
+            +\sin 
+            \(\phi 
+            \)
+            \cdot \sin 
+            \(\theta 
+            \)
+            ^{2}\cdot h}{
+            \sin 
+            \(\theta 
+            \)
+            }
+    \]
+    \co z=
+    \[\cos 
+      \(\theta 
+      \)
+      \cdot h
+      -\partial _{\theta }h\cdot \sin 
+      \(\theta 
+      \)
+    \]
+  \}
+\]
+$$
+
+
+$$
+xyz\_phi:=
+\[\{\frac{\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot 
+          \frac{\partial \partial _{\theta }h}{
+                \partial \phi }\cdot \sin 
+          \(\theta 
+          \)
+          +\cos 
+          \(\phi 
+          \)
+          \cdot 
+          \frac{\partial h}{
+                \partial \phi }\cdot \sin 
+          \(\theta 
+          \)
+          ^{2}
+          -\cos 
+          \(\phi 
+          \)
+          \cdot \partial _{\phi }h
+          -\cos 
+          \(\theta 
+          \)
+          \cdot \partial _{\theta }h\cdot \sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          -
+          \frac{\partial \partial _{\phi }h}{
+                \partial \phi }\cdot \sin 
+          \(\phi 
+          \)
+          -\sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          ^{2}\cdot h}{
+          \sin 
+          \(\theta 
+          \)
+          }\co 
+    \frac{\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot 
+          \frac{\partial \partial _{\theta }h}{
+                \partial \phi }\cdot \sin 
+          \(\theta 
+          \)
+          +\cos 
+          \(\phi 
+          \)
+          \cdot 
+          \frac{\partial h}{
+                \partial \phi }\cdot \sin 
+          \(\theta 
+          \)
+          ^{2}
+          -\cos 
+          \(\phi 
+          \)
+          \cdot \partial _{\phi }h
+          -\cos 
+          \(\theta 
+          \)
+          \cdot \partial _{\theta }h\cdot \sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          -
+          \frac{\partial \partial _{\phi }h}{
+                \partial \phi }\cdot \sin 
+          \(\phi 
+          \)
+          -\sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          ^{2}\cdot h}{
+          \sin 
+          \(\theta 
+          \)
+          }\co 
+    \frac{\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot 
+          \frac{\partial \partial _{\theta }h}{
+                \partial \phi }\cdot \sin 
+          \(\theta 
+          \)
+          +\cos 
+          \(\phi 
+          \)
+          \cdot 
+          \frac{\partial h}{
+                \partial \phi }\cdot \sin 
+          \(\theta 
+          \)
+          ^{2}
+          -\cos 
+          \(\phi 
+          \)
+          \cdot \partial _{\phi }h
+          -\cos 
+          \(\theta 
+          \)
+          \cdot \partial _{\theta }h\cdot \sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          -
+          \frac{\partial \partial _{\phi }h}{
+                \partial \phi }\cdot \sin 
+          \(\phi 
+          \)
+          -\sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          ^{2}\cdot h}{
+          \sin 
+          \(\theta 
+          \)
+          }
+  \}
+\]
+$$
+
+$$
+xyz\_theta:=
+\[\{\frac{\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot 
+          \frac{\partial \partial _{\theta }h}{
+                \partial \theta }\cdot \sin 
+          \(\theta 
+          \)
+          ^{2}
+          +\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          ^{2}\cdot h
+          +\cos 
+          \(\phi 
+          \)
+          \cdot 
+          \frac{\partial h}{
+                \partial \theta }\cdot \sin 
+          \(\theta 
+          \)
+          ^{3}
+          -\cos 
+          \(\phi 
+          \)
+          \cdot \partial _{\theta }h\cdot \sin 
+          \(\theta 
+          \)
+          ^{3}
+          +\cos 
+          \(\theta 
+          \)
+          \cdot \partial _{\phi }h\cdot \sin 
+          \(\phi 
+          \)
+          -
+          \frac{\partial \partial _{\phi }h}{
+                \partial \theta }\cdot \sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          }{
+          \sin 
+          \(\theta 
+          \)
+          ^{2}}\co 
+    \frac{\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot 
+          \frac{\partial \partial _{\theta }h}{
+                \partial \theta }\cdot \sin 
+          \(\theta 
+          \)
+          ^{2}
+          +\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          ^{2}\cdot h
+          +\cos 
+          \(\phi 
+          \)
+          \cdot 
+          \frac{\partial h}{
+                \partial \theta }\cdot \sin 
+          \(\theta 
+          \)
+          ^{3}
+          -\cos 
+          \(\phi 
+          \)
+          \cdot \partial _{\theta }h\cdot \sin 
+          \(\theta 
+          \)
+          ^{3}
+          +\cos 
+          \(\theta 
+          \)
+          \cdot \partial _{\phi }h\cdot \sin 
+          \(\phi 
+          \)
+          -
+          \frac{\partial \partial _{\phi }h}{
+                \partial \theta }\cdot \sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          }{
+          \sin 
+          \(\theta 
+          \)
+          ^{2}}\co 
+    \frac{\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot 
+          \frac{\partial \partial _{\theta }h}{
+                \partial \theta }\cdot \sin 
+          \(\theta 
+          \)
+          ^{2}
+          +\cos 
+          \(\phi 
+          \)
+          \cdot \cos 
+          \(\theta 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          ^{2}\cdot h
+          +\cos 
+          \(\phi 
+          \)
+          \cdot 
+          \frac{\partial h}{
+                \partial \theta }\cdot \sin 
+          \(\theta 
+          \)
+          ^{3}
+          -\cos 
+          \(\phi 
+          \)
+          \cdot \partial _{\theta }h\cdot \sin 
+          \(\theta 
+          \)
+          ^{3}
+          +\cos 
+          \(\theta 
+          \)
+          \cdot \partial _{\phi }h\cdot \sin 
+          \(\phi 
+          \)
+          -
+          \frac{\partial \partial _{\phi }h}{
+                \partial \theta }\cdot \sin 
+          \(\phi 
+          \)
+          \cdot \sin 
+          \(\theta 
+          \)
+          }{
+          \sin 
+          \(\theta 
+          \)
+          ^{2}}
+  \}
+\]
+$$
+
+$$
+g_{1}:=
+\[\pmatrix{\frac{\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot 
+                 \frac{\partial \partial _{\theta }h}{
+                       \partial \phi }\cdot \sin 
+                 \(\theta 
+                 \)
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot 
+                 \frac{\partial h}{
+                       \partial \phi }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}
+                 -\cos 
+                 \(\phi 
+                 \)
+                 \cdot \partial _{\phi }h
+                 -\cos 
+                 \(\theta 
+                 \)
+                 \cdot \partial _{\theta }h\cdot \sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 -
+                 \frac{\partial \partial _{\phi }h}{
+                       \partial \phi }\cdot \sin 
+                 \(\phi 
+                 \)
+                 -\sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}\cdot h}{
+                 \sin 
+                 \(\theta 
+                 \)
+                 }
+           &
+           \frac{\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot 
+                 \frac{\partial \partial _{\theta }h}{
+                       \partial \phi }\cdot \sin 
+                 \(\theta 
+                 \)
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot 
+                 \frac{\partial h}{
+                       \partial \phi }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}
+                 -\cos 
+                 \(\phi 
+                 \)
+                 \cdot \partial _{\phi }h
+                 -\cos 
+                 \(\theta 
+                 \)
+                 \cdot \partial _{\theta }h\cdot \sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 -
+                 \frac{\partial \partial _{\phi }h}{
+                       \partial \phi }\cdot \sin 
+                 \(\phi 
+                 \)
+                 -\sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}\cdot h}{
+                 \sin 
+                 \(\theta 
+                 \)
+                 }&
+           \frac{\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot 
+                 \frac{\partial \partial _{\theta }h}{
+                       \partial \phi }\cdot \sin 
+                 \(\theta 
+                 \)
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot 
+                 \frac{\partial h}{
+                       \partial \phi }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}
+                 -\cos 
+                 \(\phi 
+                 \)
+                 \cdot \partial _{\phi }h
+                 -\cos 
+                 \(\theta 
+                 \)
+                 \cdot \partial _{\theta }h\cdot \sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 -
+                 \frac{\partial \partial _{\phi }h}{
+                       \partial \phi }\cdot \sin 
+                 \(\phi 
+                 \)
+                 -\sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}\cdot h}{
+                 \sin 
+                 \(\theta 
+                 \)
+                 }\cr 
+           }
+\]
+$$
+
+$$
+g_{2}:=
+\[\pmatrix{\frac{\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot 
+                 \frac{\partial \partial _{\theta }h}{
+                       \partial \theta }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}\cdot h
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot 
+                 \frac{\partial h}{
+                       \partial \theta }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{3}
+                 -\cos 
+                 \(\phi 
+                 \)
+                 \cdot \partial _{\theta }h\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{3}
+                 +\cos 
+                 \(\theta 
+                 \)
+                 \cdot \partial _{\phi }h\cdot \sin 
+                 \(\phi 
+                 \)
+                 -
+                 \frac{\partial \partial _{\phi }h}{
+                       \partial \theta }\cdot \sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 }{
+                 \sin 
+                 \(\theta 
+                 \)
+                 ^{2}}
+           &
+           \frac{\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot 
+                 \frac{\partial \partial _{\theta }h}{
+                       \partial \theta }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}\cdot h
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot 
+                 \frac{\partial h}{
+                       \partial \theta }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{3}
+                 -\cos 
+                 \(\phi 
+                 \)
+                 \cdot \partial _{\theta }h\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{3}
+                 +\cos 
+                 \(\theta 
+                 \)
+                 \cdot \partial _{\phi }h\cdot \sin 
+                 \(\phi 
+                 \)
+                 -
+                 \frac{\partial \partial _{\phi }h}{
+                       \partial \theta }\cdot \sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 }{
+                 \sin 
+                 \(\theta 
+                 \)
+                 ^{2}}&
+           \frac{\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot 
+                 \frac{\partial \partial _{\theta }h}{
+                       \partial \theta }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot \cos 
+                 \(\theta 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{2}\cdot h
+                 +\cos 
+                 \(\phi 
+                 \)
+                 \cdot 
+                 \frac{\partial h}{
+                       \partial \theta }\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{3}
+                 -\cos 
+                 \(\phi 
+                 \)
+                 \cdot \partial _{\theta }h\cdot \sin 
+                 \(\theta 
+                 \)
+                 ^{3}
+                 +\cos 
+                 \(\theta 
+                 \)
+                 \cdot \partial _{\phi }h\cdot \sin 
+                 \(\phi 
+                 \)
+                 -
+                 \frac{\partial \partial _{\phi }h}{
+                       \partial \theta }\cdot \sin 
+                 \(\phi 
+                 \)
+                 \cdot \sin 
+                 \(\theta 
+                 \)
+                 }{
+                 \sin 
+                 \(\theta 
+                 \)
+                 ^{2}}\cr 
+           }
+\]
+$$
+
+$$
+n:=
+\[\pmatrix{\cos 
+           \(\phi 
+           \)
+           \cdot \sin 
+           \(\theta 
+           \)
+           &\sin 
+           \(\phi 
+           \)
+           \cdot \sin 
+           \(\theta 
+           \)
+           &\cos 
+           \(\theta 
+           \)
+           \cr 
+           }
+\]
+$$
+
+\begin{reduce}
+eqh;
+\end{reduce}
+$$
+h=
+\[\cos 
+  \(\phi 
+  \)
+  \cdot \sin 
+  \(\theta 
+  \)
+  \cdot x
+  +\cos 
+  \(\theta 
+  \)
+  \cdot z
+  +\sin 
+  \(\phi 
+  \)
+  \cdot \sin 
+  \(\theta 
+  \)
+  \cdot y
+\]
+$$
+
+\begin{reduce}
+xyz_phi;
+\end{reduce}
+$$
+\{\frac{\cos 
+        \(\phi 
+        \)
+        \cdot \cos 
+        \(\theta 
+        \)
+        \cdot 
+        \frac{\partial \partial _{\theta }h}{
+              \partial \phi }\cdot \sin 
+        \(\theta 
+        \)
+        +\cos 
+        \(\phi 
+        \)
+        \cdot 
+        \frac{\partial h}{
+              \partial \phi }\cdot \sin 
+        \(\theta 
+        \)
+        ^{2}
+        -\cos 
+        \(\phi 
+        \)
+        \cdot \partial _{\phi }h
+        -\cos 
+        \(\theta 
+        \)
+        \cdot \partial _{\theta }h\cdot \sin 
+        \(\phi 
+        \)
+        \cdot \sin 
+        \(\theta 
+        \)
+        -
+        \frac{\partial \partial _{\phi }h}{
+              \partial \phi }\cdot \sin 
+        \(\phi 
+        \)
+        -\sin 
+        \(\phi 
+        \)
+        \cdot \sin 
+        \(\theta 
+        \)
+        ^{2}\cdot h}{
+        \sin 
+        \(\theta 
+        \)
+        }\co 
+  \frac{\cos 
+        \(\phi 
+        \)
+        \cdot \cos 
+        \(\theta 
+        \)
+        \cdot 
+        \frac{\partial \partial _{\theta }h}{
+              \partial \phi }\cdot \sin 
+        \(\theta 
+        \)
+        +\cos 
+        \(\phi 
+        \)
+        \cdot 
+        \frac{\partial h}{
+              \partial \phi }\cdot \sin 
+        \(\theta 
+        \)
+        ^{2}
+        -\cos 
+        \(\phi 
+        \)
+        \cdot \partial _{\phi }h
+        -\cos 
+        \(\theta 
+        \)
+        \cdot \partial _{\theta }h\cdot \sin 
+        \(\phi 
+        \)
+        \cdot \sin 
+        \(\theta 
+        \)
+        -
+        \frac{\partial \partial _{\phi }h}{
+              \partial \phi }\cdot \sin 
+        \(\phi 
+        \)
+        -\sin 
+        \(\phi 
+        \)
+        \cdot \sin 
+        \(\theta 
+        \)
+        ^{2}\cdot h}{
+        \sin 
+        \(\theta 
+        \)
+        }\co 
+  \frac{\cos 
+        \(\phi 
+        \)
+        \cdot \cos 
+        \(\theta 
+        \)
+        \cdot 
+        \frac{\partial \partial _{\theta }h}{
+              \partial \phi }\cdot \sin 
+        \(\theta 
+        \)
+        +\cos 
+        \(\phi 
+        \)
+        \cdot 
+        \frac{\partial h}{
+              \partial \phi }\cdot \sin 
+        \(\theta 
+        \)
+        ^{2}
+        -\cos 
+        \(\phi 
+        \)
+        \cdot \partial _{\phi }h
+        -\cos 
+        \(\theta 
+        \)
+        \cdot \partial _{\theta }h\cdot \sin 
+        \(\phi 
+        \)
+        \cdot \sin 
+        \(\theta 
+        \)
+        -
+        \frac{\partial \partial _{\phi }h}{
+              \partial \phi }\cdot \sin 
+        \(\phi 
+        \)
+        -\sin 
+        \(\phi 
+        \)
+        \cdot \sin 
+        \(\theta 
+        \)
+        ^{2}\cdot h}{
+        \sin 
+        \(\theta 
+        \)
+        }
+\}
+$$
+
+\begin{reduce}
+
+\end{reduce}
